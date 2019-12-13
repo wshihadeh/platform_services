@@ -15,7 +15,7 @@ set (:application) { "platform_services" }
 #set (:deploy_to) { "/home/deploy/orca" }
 #set :pty, true
 
-set (:service_stacks) { %w(mysql) }
+set (:service_stacks) { %w(mysql ldap) }
 set (:service_stacks_with_build_image) { %w(nginx) }
 set (:db_apps_stacks_mapping), {}
 

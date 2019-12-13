@@ -1,5 +1,5 @@
 FROM nginx
 
-MAINTAINER Swarm Orca <wshihadh@gmail.com>
+MAINTAINER Swarm Orca <wshihadeh.dev@gmail.com>
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
