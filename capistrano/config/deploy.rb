@@ -15,7 +15,7 @@ set (:application) { "platform_services" }
 #set (:deploy_to) { "/home/deploy/orca" }
 #set :pty, true
 
-set (:service_stacks) { %w(mysql ldap) }
+set (:service_stacks) { %w(mysql ldap registry) }
 set (:service_stacks_with_build_image) { %w(nginx) }
 set (:db_apps_stacks_mapping), {}
 
@@ -28,3 +28,13 @@ set (:docker_erb_templates) { true }
 
 require "capistrano/swarm_orca/deploy"
 require "capistrano/swarm_orca/docker"
+
+desc "Copy configs to shared drive"
+task :copy_configs do
+  on roles(:swarm_manager) do |host|
+   execute <<-EOF
+     rm -rf #{fetch(:config_path)}/*
+     mv #{current_path}/configs/* #{fetch(:config_path)}/
+   EOF
+  end
+end

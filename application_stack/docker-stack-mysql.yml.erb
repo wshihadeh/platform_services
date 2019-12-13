@@ -6,7 +6,7 @@ networks:
 
 services:
 
-  mysql:
+  server:
     image: ${MYSQL_DOCKER_IMAGE}:${MYSQL_DOCKER_IMAGE_TAG}
     volumes:
       - ${MYSQL_VOLUME}:/var/lib/mysql

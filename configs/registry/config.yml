@@ -1,0 +1,35 @@
+version: 0.1
+log:
+  fields:
+    service: registry
+storage:
+    cache:
+        blobdescriptor: inmemory
+    filesystem:
+        rootdirectory: /var/lib/registry
+    delete:
+      enabled: true
+http:
+    addr: :8080
+    headers:
+        X-Content-Type-Options: [nosniff]
+auth:
+  token:
+    realm: https://hub.shihadeh.intern/v2/token
+    service: hub.shihadeh.intern
+    issuer: hub.shihadeh.intern
+    rootcertbundle: /secrets/hub.shihadeh.intern.crt
+
+notifications:
+  endpoints:
+    - name: portus
+      url: https://hub.shihadeh.intern/v2/webhooks/events
+      timeout: 500ms
+      threshold: 5
+      backoff: 1s
+
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3

@@ -1,0 +1,42 @@
+version: '3.7'
+
+networks:
+  <%= NETWORK %>:
+    external: true
+
+services:
+
+  # --- registry ---
+
+  server:
+    image: registry:2.6
+    command: ["/bin/sh", "/etc/docker/registry/init"]
+    environment:
+      REGISTRY_HTTP_ADDR: :8080
+      REGISTRY_STORAGE: ${REGISTRY_STORAGE}
+      REGISTRY_STORAGE_DELETE_ENABLED: '${REGISTRY_STORAGE_DELETE_ENABLED}'
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: ${REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY}
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+      update_config:
+        failure_action: rollback
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+    healthcheck:
+      test: "wget -q -O- http://127.0.0.1:8080/"
+      interval: 15s
+    volumes:
+      - <%= REGISTRY_VOLUME %>/data:<%= REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY %>
+      - <%= CONFIG_PATH %>/registry/config.yml:/etc/docker/registry/config.yml
+      - <%= CONFIG_PATH %>/secrets:/secrets
+      - <%= CONFIG_PATH %>/registry/init:/etc/docker/registry/init
+    networks:
+      - <%= NETWORK %>
