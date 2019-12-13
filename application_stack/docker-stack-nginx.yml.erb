@@ -1,0 +1,38 @@
+version: '3.7'
+
+networks:
+  <%= NETWORK %>:
+    external: true
+
+services:
+
+  # --- NGINX ---
+
+  nginx:
+    image: ${NGINX_DOCKER_IMAGE}:${NGINX_DOCKER_IMAGE_TAG}
+    ports:
+      - '${PORT_HTTP}:80'
+      - '${PORT_HTTPS}:443'
+    deploy:
+      replicas: <%= defined?(NGINX_REPLICA_COUNT) ? NGINX_REPLICA_COUNT : '2' %>
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+      update_config:
+        failure_action: rollback
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+    healthcheck:
+      test: ["CMD", "service", "nginx", "status"]
+    logging:
+      driver: 'json-file'
+      options:
+        "max-size": "10m"
+        "max-file": "5"
+    networks:
+      - <%= NETWORK %>
