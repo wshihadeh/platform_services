@@ -33,6 +33,10 @@ services:
     healthcheck:
       test: "wget -q -O- http://127.0.0.1:8080/"
       interval: 15s
+    <% if defined? REGISTRY_DOMAIN and defined? REGISTRY_IP  %>
+    extra_hosts:
+      - "${REGISTRY_DOMAIN}:${REGISTRY_IP}"
+    <% end %>
     volumes:
       - <%= REGISTRY_VOLUME %>/data:<%= REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY %>
       - <%= CONFIG_PATH %>/registry/config.yml:/etc/docker/registry/config.yml

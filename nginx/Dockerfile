@@ -1,5 +1,8 @@
-FROM nginx
+FROM nginx:latest
 
-MAINTAINER Swarm Orca <wshihadeh.dev@gmail.com>
+LABEL maintainer="AL-waleed Shihadeh <wshihadeh@gmail.com>"
 
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./server/*.conf /etc/nginx/conf.d/server/
+COPY ./default.conf /etc/nginx/conf.d/default.conf
+COPY ./nginx.conf /etc/nginx/nginx.conf
+

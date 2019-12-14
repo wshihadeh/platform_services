@@ -1,0 +1,112 @@
+version: '3.7'
+
+networks:
+  <%= NETWORK %>:
+    external: true
+
+services:
+
+  server:
+    image: opensuse/portus:2.4.3
+    environment:
+      PORTUS_MACHINE_FQDN_VALUE: ${PORTUS_MACHINE_FQDN_VALUE}
+      PORTUS_DB_HOST: ${PORTUS_DB_HOST}
+      PORTUS_DB_DATABASE: ${PORTUS_DB_DATABASE}
+      PORTUS_DB_USERNAME: ${PORTUS_DB_USERNAME}
+      PORTUS_DB_PASSWORD: ${PORTUS_DB_PASSWORD}
+      PORTUS_DB_POOL: ${PORTUS_DB_POOL}
+      CCONFIG_PREFIX: ${CCONFIG_PREFIX}
+      PORTUS_SECRET_KEY_BASE: ${PORTUS_SECRET_KEY_BASE}
+      PORTUS_KEY_PATH: ${PORTUS_KEY_PATH}
+      PORTUS_PASSWORD: ${PORTUS_PASSWORD}
+      PORTUS_CHECK_SSL_USAGE_ENABLED: ${PORTUS_CHECK_SSL_USAGE_ENABLED}
+      RAILS_SERVE_STATIC_FILES: ${RAILS_SERVE_STATIC_FILES}
+      PORTUS_LDAP_ENABLED: ${PORTUS_LDAP_ENABLED}
+      PORTUS_LDAP_HOSTNAME: ${PORTUS_LDAP_HOSTNAME}
+      PORTUS_LDAP_PORT: ${PORTUS_LDAP_PORT}
+      PORTUS_LDAP_UID: ${PORTUS_LDAP_UID}
+      PORTUS_LDAP_BASE: ${PORTUS_LDAP_BASE}
+      PORTUS_LDAP_FILTER: ${PORTUS_LDAP_FILTER}
+      PORTUS_LDAP_AUTHENTICATION_ENABLED: ${PORTUS_LDAP_AUTHENTICATION_ENABLED}
+      PORTUS_LDAP_AUTHENTICATION_BIND_DN: ${PORTUS_LDAP_AUTHENTICATION_BIND_DN}
+      PORTUS_LDAP_AUTHENTICATION_PASSWORD: ${PORTUS_LDAP_AUTHENTICATION_PASSWORD}
+      PORTUS_LDAP_ENCRYPTION_METHOD: ${PORTUS_LDAP_ENCRYPTION_METHOD}
+      PORTUS_DELETE_ENABLED: ${PORTUS_DELETE_ENABLED}
+      PORTUS_DELETE_CONTRIBUTORS: ${PORTUS_DELETE_CONTRIBUTORS}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_ENABLED: ${PORTUS_DELETE_GARBAGE_COLLECTOR_ENABLED}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_OLDER_THAN: ${PORTUS_DELETE_GARBAGE_COLLECTOR_OLDER_THAN}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_KEEP_LATEST: ${PORTUS_DELETE_GARBAGE_COLLECTOR_KEEP_LATEST}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_TAG: ${PORTUS_DELETE_GARBAGE_COLLECTOR_TAG}
+      PORTUS_PAGINATION_LIMIT: ${PORTUS_PAGINATION_LIMIT}
+      PORTUS_PAGINATION_BEFORE_AFTER: ${PORTUS_PAGINATION_BEFORE_AFTER}
+    volumes:
+      - <%= CONFIG_PATH %>/secrets:/certificates
+    <% if defined? REGISTRY_DOMAIN and defined? REGISTRY_IP  %>
+    extra_hosts:
+      - "${REGISTRY_DOMAIN}:${REGISTRY_IP}"
+    <% end %>
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+      update_config:
+        failure_action: rollback
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+    healthcheck:
+      test: ["CMD", "pgrep", "-fla", "puma"]
+    networks:
+      - <%= NETWORK %>
+
+  background:
+    image: opensuse/portus:2.4.3
+    environment:
+      PORTUS_MACHINE_FQDN_VALUE: ${PORTUS_MACHINE_FQDN_VALUE}
+      CCONFIG_PREFIX: ${CCONFIG_PREFIX}
+      PORTUS_DB_HOST: ${PORTUS_DB_HOST}
+      PORTUS_DB_DATABASE: ${PORTUS_DB_DATABASE}
+      PORTUS_DB_USERNAME: ${PORTUS_DB_USERNAME}
+      PORTUS_DB_PASSWORD: ${PORTUS_DB_PASSWORD}
+      PORTUS_DB_POOL: ${PORTUS_DB_POOL}
+      PORTUS_BACKGROUND: 'true'
+      PORTUS_SECRET_KEY_BASE: ${PORTUS_SECRET_KEY_BASE}
+      PORTUS_KEY_PATH: ${PORTUS_KEY_PATH}
+      PORTUS_PASSWORD: ${PORTUS_PASSWORD}
+      PORTUS_DELETE_ENABLED: ${PORTUS_DELETE_ENABLED}
+      PORTUS_DELETE_CONTRIBUTORS: ${PORTUS_DELETE_CONTRIBUTORS}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_ENABLED: ${PORTUS_DELETE_GARBAGE_COLLECTOR_ENABLED}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_OLDER_THAN: ${PORTUS_DELETE_GARBAGE_COLLECTOR_OLDER_THAN}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_KEEP_LATEST: ${PORTUS_DELETE_GARBAGE_COLLECTOR_KEEP_LATEST}
+      PORTUS_DELETE_GARBAGE_COLLECTOR_TAG: ${PORTUS_DELETE_GARBAGE_COLLECTOR_TAG}
+      PORTUS_PAGINATION_LIMIT: ${PORTUS_PAGINATION_LIMIT}
+      PORTUS_PAGINATION_BEFORE_AFTER: ${PORTUS_PAGINATION_BEFORE_AFTER}
+    volumes:
+      - <%= CONFIG_PATH %>/secrets:/certificates
+    <% if defined? REGISTRY_DOMAIN and defined? REGISTRY_IP  %>
+    extra_hosts:
+      - "${REGISTRY_DOMAIN}:${REGISTRY_IP}"
+    <% end %>
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 10
+      update_config:
+        failure_action: rollback
+        parallelism: 1
+        delay: 10s
+        order: start-first
+      rollback_config:
+        parallelism: 0
+        order: stop-first
+    healthcheck:
+      test: ["CMD", "pgrep", "-fla", "background"]
+    networks:
+      - <%= NETWORK %>
