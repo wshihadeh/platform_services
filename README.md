@@ -3,6 +3,9 @@
 
   * Nginx
   * MySql
+  * Registry
+  * Ldap
+  * portus
 
 # Deployment Steps
   - Prepare your deployment stage file under `config/deploy/${your_stage_name}.rb`. You can duplicate the `template_stage` and replace all the necessary configurations.
