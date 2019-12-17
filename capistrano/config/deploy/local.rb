@@ -7,6 +7,7 @@ server '127.0.0.1', user: 'shihadeh',
                            ldap
                            registry
                            portus
+                           clair
                            swarm_manager
                          ]
 
@@ -84,4 +85,16 @@ set :portus,
     portus_delete_garbage_collector_keep_latest: '5',
     portus_delete_garbage_collector_tag: 'featuer*',
     portus_pagination_limit: '10',
-    portus_pagination_before_after: '2'
+    portus_pagination_before_after: '2',
+    PORTUS_SECURITY_CLAIR_SERVER: 'http://clair_server:6060'
+
+set :clair,
+    stack_name: 'clair',
+    postgres_docker_image: 'postgres',
+    postgres_docker_image_tag: 'alpine',
+    postgres_user: 'postgres',
+    postgres_password: 'clair12postgres',
+    postgres_db: 'clair_db',
+    clair_docker_image: 'wshihadeh/clair',
+    clair_docker_image_tag: 'v0.1',
+    postgres_database_url: 'postgresql://postgres:clair12postgres@clair_postgres:5432/clair_db?sslmode=disable'
